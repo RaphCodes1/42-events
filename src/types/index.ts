@@ -1,0 +1,32 @@
+export interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  imageUrl: string;
+  category: EventCategory;
+  createdAt: string;
+}
+
+export type EventCategory = 'conference' | 'workshop' | 'meetup' | 'concert' | 'exhibition' | 'other';
+
+export type SortOption = 'title-asc' | 'title-desc' | 'date-asc' | 'date-desc' | 'created-asc' | 'created-desc';
+
+export interface UserState {
+  subscribedEvents: string[];
+  subscribe: (eventId: string) => void;
+  unsubscribe: (eventId: string) => void;
+  isSubscribed: (eventId: string) => boolean;
+}
+
+export interface EventsState {
+  events: Event[];
+  filteredEvents: Event[];
+  searchTerm: string;
+  sortOption: SortOption;
+  categoryFilter: EventCategory | 'all';
+  setSearchTerm: (term: string) => void;
+  setSortOption: (option: SortOption) => void;
+  setCategoryFilter: (category: EventCategory | 'all') => void;
+}
