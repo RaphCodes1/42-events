@@ -50,7 +50,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
   return (
     <div className="relative" ref={ref}>
       <button
-        className="flex items-center gap-2 px-3 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm font-medium text-gray-700"
+        className="flex items-center gap-2 px-3 py-2 rounded-md bg-transparent border-none shadow-none focus:outline-none text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100/20 dark:hover:bg-gray-700/20"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>Sort: {getCurrentSortLabel()}</span>
@@ -64,14 +64,14 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-1 w-52 rounded-md shadow-lg bg-white border border-gray-200 z-10"
+            className="absolute right-0 mt-1 w-52 rounded-md shadow-lg bg-white/80 dark:bg-gray-900/80 border-none z-10"
           >
-            <div className="py-1 rounded-md bg-white shadow-xs">
+            <div className="py-1 rounded-md bg-transparent shadow-xs">
               {sortOptions.map((option) => (
                 <button
                   key={option.value}
-                  className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    currentSort === option.value ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-700'
+                  className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm hover:bg-gray-100/30 dark:hover:bg-gray-700/30 ${
+                    currentSort === option.value ? 'bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 font-medium' : 'text-gray-700 dark:text-gray-200'
                   }`}
                   onClick={() => handleSelect(option.value as SortOption)}
                 >

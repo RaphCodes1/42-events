@@ -65,6 +65,28 @@ const useEventsStore = create<EventsState>()((set, get) => ({
     const filtered = filterEvents(events, searchTerm, categoryFilter);
     set({ filteredEvents: sortEvents(filtered, sortOption) });
   },
+
+  addEvent: (event) => {
+    set((state) => {
+      const events = [event, ...state.events];
+      const filtered = filterEvents(events, state.searchTerm, state.categoryFilter);
+      return {
+        events,
+        filteredEvents: sortEvents(filtered, state.sortOption),
+      };
+    });
+  },
+
+  deleteEvent: (eventId) => {
+    set((state) => {
+      const events = state.events.filter(e => e.id !== eventId);
+      const filtered = filterEvents(events, state.searchTerm, state.categoryFilter);
+      return {
+        events,
+        filteredEvents: sortEvents(filtered, state.sortOption),
+      };
+    });
+  },
 }));
 
 export default useEventsStore;

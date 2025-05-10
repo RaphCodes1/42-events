@@ -20,7 +20,6 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
     { value: 'conference', label: 'Conferences' },
     { value: 'workshop', label: 'Workshops' },
     { value: 'meetup', label: 'Meetups' },
-    { value: 'concert', label: 'Concerts' },
     { value: 'exhibition', label: 'Exhibitions' },
     { value: 'other', label: 'Other' },
   ];
@@ -51,7 +50,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   return (
     <div className="relative" ref={ref}>
       <button
-        className="flex items-center gap-2 px-3 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm font-medium text-gray-700"
+        className="flex items-center gap-2 px-3 py-2 rounded-md bg-transparent border-none shadow-none focus:outline-none text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100/20 dark:hover:bg-gray-700/20"
         onClick={() => setIsOpen(!isOpen)}
       >
         <Filter size={16} />
@@ -66,14 +65,14 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-0 mt-1 w-48 rounded-md shadow-lg bg-white border border-gray-200 z-10"
+            className="absolute left-0 mt-1 w-48 rounded-md shadow-lg bg-white/80 dark:bg-gray-900/80 border-none z-10"
           >
-            <div className="py-1 rounded-md bg-white shadow-xs">
+            <div className="py-1 rounded-md bg-transparent shadow-xs">
               {categories.map((category) => (
                 <button
                   key={category.value}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    currentCategory === category.value ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-700'
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100/30 dark:hover:bg-gray-700/30 ${
+                    currentCategory === category.value ? 'bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 font-medium' : 'text-gray-700 dark:text-gray-200'
                   }`}
                   onClick={() => handleSelect(category.value as EventCategory | 'all')}
                 >

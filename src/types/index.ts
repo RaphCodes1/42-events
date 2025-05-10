@@ -9,7 +9,7 @@ export interface Event {
   createdAt: string;
 }
 
-export type EventCategory = 'conference' | 'workshop' | 'meetup' | 'concert' | 'exhibition' | 'other';
+export type EventCategory = 'conference' | 'workshop' | 'meetup' | 'exhibition' | 'other';
 
 export type SortOption = 'title-asc' | 'title-desc' | 'date-asc' | 'date-desc' | 'created-asc' | 'created-desc';
 
@@ -29,4 +29,6 @@ export interface EventsState {
   setSearchTerm: (term: string) => void;
   setSortOption: (option: SortOption) => void;
   setCategoryFilter: (category: EventCategory | 'all') => void;
+  addEvent: (event: Event) => void;
+  deleteEvent: (eventId: string) => void;
 }

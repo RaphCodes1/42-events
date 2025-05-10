@@ -14,6 +14,7 @@ import useEventsStore from '../store/eventsStore';
 import useUserStore from '../store/userStore';
 import { Event } from '../types';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Home() {
   const { filteredEvents, searchTerm, setSearchTerm, sortOption, setSortOption, categoryFilter, setCategoryFilter } = useEventsStore();
@@ -69,16 +70,17 @@ export default function Home() {
       <header className={`sticky top-0 z-40 bg-white dark:bg-gray-800 transition-shadow duration-300 ${scrollY > 10 ? 'shadow-md' : ''}`}>
         <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center justify-between">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center"
-            >
-              <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={28} />
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">42 Plans</h1>
-            </motion.div>
-            <ThemeToggle />
+            <Link href="/" className="flex items-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center"
+              >
+                {/* <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={28} /> */}
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">42 Calendar</h1>
+              </motion.div>
+            </Link>
           </div>
           
           <div className="flex-1 max-w-md">
@@ -157,7 +159,7 @@ export default function Home() {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
           >
             {displayedEvents.map((event, index) => (
               <EventCard
@@ -177,10 +179,10 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
               <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={20} />
-              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">EventPulse</span>
+              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">42 Calendar</span>
             </div>
             <div className="text-gray-600 dark:text-gray-400 text-sm">
-              © {new Date().getFullYear()} EventPulse. All rights reserved.
+              © {new Date().getFullYear()} 42 Calendar. All rights reserved.
             </div>
           </div>
         </div>
@@ -216,12 +218,17 @@ function SettingsDropdown() {
         className="flex items-center gap-1.5 px-3 py-2 rounded-md border text-sm font-medium transition-colors bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
         onClick={() => setOpen((v) => !v)}
       >
-        <Settings size={16} className="mr-1" />
-        <span>Settings</span>
+        <Settings size={19} className="mr-1" />
+        {/* <span>Settings</span> */}
         <svg className={`ml-1 w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+        <div className="absolute right-0 mt-2 min-w-[180px] w-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+          <div className="flex items-center  px-4 py-2">
+            <span className="text-sm text-gray-700 dark:text-gray-200 mr-1">Theme</span>
+            <ThemeToggle />
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
           <button
             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
             onClick={handleAccount}

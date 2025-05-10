@@ -10,9 +10,10 @@ interface EventModalProps {
   event: Event | null;
   isOpen: boolean;
   onClose: () => void;
+  categoryColor?: string;
 }
 
-export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }) => {
+export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose, categoryColor }) => {
   const { isSubscribed, subscribe, unsubscribe } = useUserStore();
   
   if (!event) return null;
@@ -28,15 +29,13 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
   };
   
   const categoryColors = {
-    conference: 'bg-blue-100 text-blue-800',
-    workshop: 'bg-green-100 text-green-800',
-    meetup: 'bg-purple-100 text-purple-800',
-    concert: 'bg-pink-100 text-pink-800',
-    exhibition: 'bg-amber-100 text-amber-800',
-    other: 'bg-gray-100 text-gray-800',
+    conference: 'bg-blue-100 text-blue-800 border-blue-200',
+    workshop: 'bg-green-100 text-green-800 border-green-200',
+    meetup: 'bg-purple-100 text-purple-800 border-purple-200',
+    exhibition: 'bg-amber-100 text-amber-800 border-amber-200',
+    other: 'bg-gray-100 text-gray-800 border-gray-200',
   };
 
-  const categoryColor = categoryColors[event.category];
   const eventDate = parseISO(event.date);
   
   return (
@@ -58,28 +57,22 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-xl shadow-xl w-full max-w-md sm:max-w-xl md:max-w-2xl overflow-hidden relative"
+              className={`bg-white rounded-xl shadow-xl w-full max-w-md sm:max-w-xl md:max-w-2xl overflow-hidden relative border-[5px] ${categoryColor?.split(' ')[2]}`}
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
             >
-              <div className="relative aspect-video overflow-hidden">
-                <img 
-                  src={event.imageUrl} 
-                  alt={event.title} 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+              <div className={`w-full h-20 relative overflow-hidden ${categoryColor?.split(' ')[0]}`}>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <h2 className={`text-xl font-bold truncate text-center p-4 ${categoryColor?.split(' ')[1]}`}>{event.title}</h2>
+                </div>
                 <button 
                   onClick={onClose}
                   className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
-                <div className="absolute bottom-0 left-0 p-6 w-full">
-                  <h2 className="text-white text-2xl sm:text-3xl font-bold">{event.title}</h2>
-                </div>
               </div>
               
               <div className="p-6">
