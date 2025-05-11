@@ -42,6 +42,15 @@ export default function LoginPage() {
       }
 
       console.log('Auth successful, user:', authData.user.id);
+      console.log('Access Token:', authData.session.access_token);
+      console.log('Refresh Token:', authData.session.refresh_token);
+
+      console.log("Auth Session:", authData.session);
+      await supabase.auth.setSession({
+        access_token: authData.session.access_token,
+        refresh_token: authData.session.refresh_token,
+      });
+
 
       // Check if user is admin
       const { data: roleData, error: roleError } = await supabase
@@ -84,13 +93,13 @@ export default function LoginPage() {
   };
 
   // Add a debug effect to check session
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('Current session:', session);
-    };
-    checkSession();
-  }, []);
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //     const { data: { session } } = await supabase.auth.getSession();
+  //     console.log('Current session:', session);
+  //   };
+  //   checkSession();
+  // }, []);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900">

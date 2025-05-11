@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Clock, MapPin, Tag } from 'lucide-react';
+import { X, Calendar, Clock, MapPin, Tag, Edit, Trash2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { Event } from '../../types';
 import { Button } from '../ui/Button';
@@ -11,9 +11,20 @@ interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
   categoryColor?: string;
+  isAdmin?: boolean;
+  onEdit?: (event: Event) => void;
+  onDelete?: (eventId: string) => void;
 }
 
-export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose, categoryColor }) => {
+export const EventModal: React.FC<EventModalProps> = ({ 
+  event, 
+  isOpen, 
+  onClose, 
+  categoryColor,
+  isAdmin = false,
+  onEdit,
+  onDelete
+}) => {
   const { isSubscribed, subscribe, unsubscribe } = useUserStore();
   
   if (!event) return null;
@@ -26,6 +37,16 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose, 
     } else {
       subscribe(event.id);
     }
+  };
+
+  const handleEdit = () => {
+    onEdit?.(event);
+    onClose();
+  };
+
+  const handleDelete = () => {
+    onDelete?.(event.id);
+    onClose();
   };
   
   const categoryColors = {
@@ -75,7 +96,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose, 
                 </button>
               </div>
               
-              <div className="p-6">
+              <div className="p-6 bg-white">
                 <div className="flex flex-wrap gap-4 mb-6">
                   <div className="flex items-center text-sm text-gray-700">
                     <Calendar size={18} className="mr-2 text-primary-600" />
@@ -108,13 +129,34 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose, 
                   <Button variant="outline" onClick={onClose}>
                     Close
                   </Button>
-                  <Button 
-                    onClick={handleSubscribeToggle}
-                    variant={subscribed ? "outline" : "primary"}
-                    className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : ""}
-                  >
-                    {subscribed ? "Unsubscribe" : "Subscribe to Event"}
-                  </Button>
+                  {isAdmin ? (
+                    <>
+                      <Button 
+                        onClick={handleEdit}
+                        variant="outline"
+                        className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                      >
+                        <Edit size={16} className="mr-2" />
+                        Edit
+                      </Button>
+                      <Button 
+                        onClick={handleDelete}
+                        variant="outline"
+                        className="border-red-600 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 size={16} className="mr-2" />
+                        Delete
+                      </Button>
+                    </>
+                  ) : (
+                    <Button 
+                      onClick={handleSubscribeToggle}
+                      variant={subscribed ? "outline" : "primary"}
+                      className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : ""}
+                    >
+                      {subscribed ? "Unsubscribe" : "Subscribe to Event"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>
