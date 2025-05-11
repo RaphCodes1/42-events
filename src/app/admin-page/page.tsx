@@ -372,7 +372,7 @@ export default function AdminPage() {
               transition={{ duration: 0.5 }}
               className="flex items-center"
             >
-              <Calendar className="text-primary-400 mr-2" size={28} />
+              {/* <Calendar className="text-primary-400 mr-2" size={28} /> */}
               <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
             </motion.div>
           </div>

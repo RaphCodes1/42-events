@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import React from 'react';
 import { fetchEvents } from '../data/mockEvents';
+import Image from 'next/image';
 
 export default function Home() {
   const { filteredEvents, searchTerm, setSearchTerm, sortOption, setSortOption, categoryFilter, setCategoryFilter } = useEventsStore();
@@ -108,20 +109,20 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
-      <header className={`sticky top-0 z-40 bg-gray-50 dark:bg-gray-900 transition-all duration-300 ${scrollY > 10 ? 'shadow-md' : ''}`}>
+      <header className={`sticky top-0 z-40 bg-gray-50 dark:bg-gray-900 transition-all duration-300 border-b border-gray-200 dark:border-gray-700 ${scrollY > 10 ? 'shadow-md' : ''}`}>
         <div className="container mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="flex items-center"
-              >
-                {/* <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={28} /> */}
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">42 Calendar</h1>
-              </motion.div>
-            </Link>
+          <div className="flex items-center">
+            <div className="flex items-center">
+              {/* <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={24} /> */}
+              <Image
+                src="/42_logo_white.png"
+                alt="42 Logo"
+                width={40}
+                height={40}
+                className="mr-2 invert dark:invert-0"
+              />
+              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200 mr-12">Calendar</span>
+            </div>
           </div>
           
           <div className="flex-1 max-w-md">
@@ -249,8 +250,17 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
-              <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={16} />
-              <span className="text-base font-semibold text-gray-800 dark:text-gray-200">42 Calendar</span>
+              <div className="flex items-center">
+                {/* <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={16} /> */}
+                <Image
+                  src="/42_logo_white.png"
+                  alt="42 Logo"
+                  width={24}
+                  height={24}
+                  className="mr-2 invert dark:invert-0"
+                />
+                <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">Calendar</span>
+              </div>
             </div>
             <div className="text-gray-600 dark:text-gray-400 text-xs">
               © {new Date().getFullYear()} 42 Calendar. All rights reserved.

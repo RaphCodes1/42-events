@@ -105,7 +105,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900">
       <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-md p-8">
         <div className="flex items-center justify-center mb-6">
-          <Calendar className="text-primary-400 mr-2" size={32} />
+          {/* <Calendar className="text-primary-400 mr-2" size={32} /> */}
           <h1 className="text-2xl font-bold text-white">Login to 42 Calendar</h1>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
