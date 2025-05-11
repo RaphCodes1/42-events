@@ -364,7 +364,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-900 transition-colors duration-200">
       {/* Header */}
       <header className={`sticky top-0 z-40 bg-gray-800 transition-shadow duration-300 ${scrollY > 10 ? 'shadow-md' : ''}`}>
-        <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="container mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}

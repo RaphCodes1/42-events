@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, User, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar, User, Settings, Loader2 } from 'lucide-react';
 import { SearchBar } from '../components/ui/SearchBar';
 import { EventCard } from '../components/events/EventCard';
 import { EventModal } from '../components/events/EventModal';
@@ -25,16 +25,20 @@ export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSubscribed, setShowSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { scrollY } = useScrollEffect();
   const router = useRouter();
   
   // Fetch events when component mounts
   React.useEffect(() => {
     const initializeData = async () => {
+      setIsLoading(true);
       try {
         await fetchEvents();
       } catch (error) {
         console.error('Error initializing events:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     initializeData();
@@ -102,10 +106,10 @@ export default function Home() {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
-      <header className={`sticky top-0 z-40 bg-white dark:bg-gray-800 transition-shadow duration-300 ${scrollY > 10 ? 'shadow-md' : ''}`}>
-        <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <header className={`sticky top-0 z-40 bg-gray-50 dark:bg-gray-900 transition-all duration-300 ${scrollY > 10 ? 'shadow-md' : ''}`}>
+        <div className="container mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
               <motion.div
@@ -167,58 +171,88 @@ export default function Home() {
       </div>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8">
         {/* Results count and filters */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
             {showSubscribed ? 'My Subscribed Events' : 'Upcoming Events'}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            {displayedEvents.length === 0 
-              ? 'No events found' 
-              : `Showing ${displayedEvents.length} event${displayedEvents.length !== 1 ? 's' : ''}`}
+            {isLoading ? 'Loading events...' : 
+              displayedEvents.length === 0 
+                ? 'No events found' 
+                : `Showing ${displayedEvents.length} event${displayedEvents.length !== 1 ? 's' : ''}`
+            }
           </p>
         </div>
 
+        {/* Loading state */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-16 text-center"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="mb-4"
+              >
+                <Loader2 className="text-primary-500 dark:text-primary-400" size={48} />
+              </motion.div>
+              <h3 className="text-xl font-medium text-gray-600 dark:text-gray-400 mb-2">Loading Events</h3>
+              <p className="text-gray-500 dark:text-gray-500 max-w-md">
+                Please wait while we fetch your events...
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Events grid */}
-        {displayedEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Calendar className="text-gray-400 dark:text-gray-600 mb-4" size={48} />
-            <h3 className="text-xl font-medium text-gray-600 dark:text-gray-400 mb-2">No events found</h3>
-            <p className="text-gray-500 dark:text-gray-500 max-w-md">
-              {showSubscribed 
-                ? "You haven't subscribed to any events yet. Browse the events and subscribe to see them here."
-                : "Try adjusting your filters or search terms to find events."}
-            </p>
-          </div>
-        ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
-          >
-            {displayedEvents.map((event, index) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                index={index}
-                onClick={() => handleEventClick(event)}
-              />
-            ))}
-          </motion.div>
+        {!isLoading && (
+          <>
+            {displayedEvents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <Calendar className="text-gray-400 dark:text-gray-600 mb-4" size={48} />
+                <h3 className="text-xl font-medium text-gray-600 dark:text-gray-400 mb-2">No events found</h3>
+                <p className="text-gray-500 dark:text-gray-500 max-w-md">
+                  {showSubscribed 
+                    ? "You haven't subscribed to any events yet. Browse the events and subscribe to see them here."
+                    : "Try adjusting your filters or search terms to find events."}
+                </p>
+              </div>
+            ) : (
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+              >
+                {displayedEvents.map((event, index) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    index={index}
+                    onClick={() => handleEventClick(event)}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-8 mt-12">
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-auto">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
-              <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={20} />
-              <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">42 Calendar</span>
+              <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={16} />
+              <span className="text-base font-semibold text-gray-800 dark:text-gray-200">42 Calendar</span>
             </div>
-            <div className="text-gray-600 dark:text-gray-400 text-sm">
+            <div className="text-gray-600 dark:text-gray-400 text-xs">
               © {new Date().getFullYear()} 42 Calendar. All rights reserved.
             </div>
           </div>
