@@ -3,12 +3,15 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -17,14 +20,23 @@ export default function SignupPage() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock validation
-    if (!name || !email || !password) {
-      setError("Please fill in all fields.");
-    } else {
-      setError("");
-      alert("Mock signup successful!");
+    try {
+      let { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password
+      });
+      if(data){
+        setError("Please check your email for verification link before logging in.");
+      }
+      if (error) {
+        setError(error.message);
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An unexpected error occurred.");
     }
   };
 

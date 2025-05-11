@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Plus, Edit, Trash2, Settings, Tag } from 'lucide-react';
+import { Calendar, Plus, Edit, Trash2, Tag, LogOut } from 'lucide-react';
 import { SearchBar } from '../../components/ui/SearchBar';
 import { EventModal } from '../../components/events/EventModal';
 import { SortDropdown } from '../../components/events/SortDropdown';
@@ -11,7 +11,7 @@ import { useScrollEffect } from '../../hooks/useScrollEffect';
 import useEventsStore from '../../store/eventsStore';
 import { Event } from '../../types';
 import { useRouter } from 'next/navigation';
-import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import { supabase } from "@/lib/supabase";
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
@@ -33,6 +33,44 @@ export default function AdminPage() {
   const [editEvent, setEditEvent] = useState<Event | null>(null);
   const { scrollY } = useScrollEffect();
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const router = useRouter();
+
+  // Check admin access
+  React.useEffect(() => {
+    const checkAdminAccess = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.log('No session found, redirecting to login');
+        router.push('/login');
+        return;
+      }
+
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .single();
+
+      console.log('Role check in admin page:', { roleData, roleError });
+
+      if (roleError || !roleData || roleData.role !== 'admin') {
+        console.log('Not an admin, redirecting to home');
+        router.push('/');
+        return;
+      }
+    };
+
+    checkAdminAccess();
+  }, [router]);
+
+  // Force dark mode
+  React.useEffect(() => {
+    document.documentElement.classList.add('dark');
+    return () => {
+      document.documentElement.classList.remove('dark');
+    };
+  }, []);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -86,6 +124,11 @@ export default function AdminPage() {
     setDeleteConfirmId(null);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   const displayedEvents = filteredEvents;
 
   const containerVariants = {
@@ -107,9 +150,9 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <header className={`sticky top-0 z-40 bg-white dark:bg-gray-800 transition-shadow duration-300 ${scrollY > 10 ? 'shadow-md' : ''}`}>
+      <header className={`sticky top-0 z-40 bg-gray-800 transition-shadow duration-300 ${scrollY > 10 ? 'shadow-md' : ''}`}>
         <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center">
             <motion.div
@@ -118,8 +161,8 @@ export default function AdminPage() {
               transition={{ duration: 0.5 }}
               className="flex items-center"
             >
-              <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={28} />
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Panel</h1>
+              <Calendar className="text-primary-400 mr-2" size={28} />
+              <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
             </motion.div>
           </div>
           <div className="flex flex-1 items-center justify-end gap-2 max-w-md">
@@ -127,13 +170,19 @@ export default function AdminPage() {
               onSearch={handleSearch}
               initialValue={searchTerm}
             />
-            <SettingsDropdown />
+            <button
+              onClick={handleLogout}
+              className="flex items-center px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 rounded-md transition-colors"
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Logout
+            </button>
           </div>
         </div>
       </header>
 
       {/* Filters */}
-      <div className="container mx-auto px-4 py-4 flex flex-wrap items-center gap-3 justify-between border-b border-gray-200 dark:border-gray-700">
+      <div className="container mx-auto px-4 py-4 flex flex-wrap items-center gap-3 justify-between border-b border-gray-700">
         <div className="flex items-center gap-3">
           <CategoryFilter 
             currentCategory={categoryFilter}
@@ -152,7 +201,7 @@ export default function AdminPage() {
       <main className="container mx-auto px-4 pt-8 pb-0">
         {/* Results count and create button */}
         <div className="mb-0 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          <h2 className="text-xl font-semibold text-gray-200 mb-2">
             Upcoming Events
           </h2>
           <motion.button
@@ -166,7 +215,7 @@ export default function AdminPage() {
           </motion.button>
         </div>
         <div className="mb-8">
-          <span className="text-gray-600 dark:text-gray-400 text-base">
+          <span className="text-gray-400 text-base">
             Showing {displayedEvents.length} event{displayedEvents.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -174,9 +223,9 @@ export default function AdminPage() {
         {/* Events grid */}
         {displayedEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Calendar className="text-gray-400 dark:text-gray-600 mb-4" size={48} />
-            <h3 className="text-xl font-medium text-gray-600 dark:text-gray-400 mb-2">No events found</h3>
-            <p className="text-gray-500 dark:text-gray-500 max-w-md">
+            <Calendar className="text-gray-600 mb-4" size={48} />
+            <h3 className="text-xl font-medium text-gray-400 mb-2">No events found</h3>
+            <p className="text-gray-500 max-w-md">
               Try adjusting your filters or search terms to find events.
             </p>
           </div>
@@ -190,7 +239,7 @@ export default function AdminPage() {
             {displayedEvents.map((event, index) => (
               <motion.div
                 key={event.id}
-                className={`relative rounded-xl overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow border-[5px] ${categoryColors[event.category].split(' ')[2]}`}
+                className={`relative rounded-xl overflow-hidden bg-gray-800 shadow-md hover:shadow-lg transition-shadow border-[5px] ${categoryColors[event.category].split(' ')[2]}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
@@ -202,7 +251,7 @@ export default function AdminPage() {
                     <h3 className={`text-xl font-bold truncate text-center p-4 ${categoryColors[event.category].split(' ')[1]}`}>{event.title}</h3>
                   </div>
                 </div>
-                <div className="p-4">
+                <div className="p-4 bg-white">
                   <div className="flex items-center justify-center text-xs text-gray-600 mb-2">
                     <Calendar size={16} className="mr-0" />
                     <span className="px-2 py-1.2 whitespace-nowrap" style={{ fontSize: '12px' }}>{formatDate(event.date)}</span>
@@ -222,14 +271,20 @@ export default function AdminPage() {
                     <div className="flex gap-2">
                       <button
                         className="p-2 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
-                        onClick={() => handleEdit(event)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(event);
+                        }}
                         aria-label="Edit Event"
                       >
                         <Edit size={16} />
                       </button>
                       <button
                         className="p-2 rounded-full bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
-                        onClick={() => handleDelete(event.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(event.id);
+                        }}
                         aria-label="Delete Event"
                       >
                         <Trash2 size={16} />
@@ -249,24 +304,27 @@ export default function AdminPage() {
         isOpen={isModalOpen}
         onClose={closeModal}
         categoryColor={categoryColors[selectedEvent?.category || 'other']}
+        isAdmin={true}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
-      {/* Create/Edit Event Modal (mock) */}
+
+      {/* Create/Edit Event Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md p-8 relative"
+            className="bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl sm:max-w-3xl md:max-w-4xl p-8 relative"
           >
             <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-200"
               onClick={() => setIsCreateModalOpen(false)}
             >
               ×
             </button>
-            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">{editEvent ? 'Edit Event' : 'Create Event'}</h2>
-            {/* Mock form fields */}
+            <h2 className="text-xl font-bold mb-4 text-white">{editEvent ? 'Edit Event' : 'Create Event'}</h2>
             <form
               onSubmit={e => {
                 e.preventDefault();
@@ -276,19 +334,17 @@ export default function AdminPage() {
                   description: (e.target as any).description.value,
                   date: (e.target as any).date.value,
                   location: (e.target as any).location.value,
-                  imageUrl: (e.target as any).imageUrl.value,
                   category: (e.target as any).category.value,
                   createdAt: new Date().toISOString(),
                 });
               }}
               className="space-y-4"
             >
-              <input name="title" defaultValue={editEvent?.title || ''} placeholder="Title" className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required />
-              <textarea name="description" defaultValue={editEvent?.description || ''} placeholder="Description" className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required />
-              <input name="date" type="date" defaultValue={editEvent?.date?.slice(0,10) || ''} className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required />
-              <input name="location" defaultValue={editEvent?.location || ''} placeholder="Location" className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required />
-              <input name="imageUrl" defaultValue={editEvent?.imageUrl || ''} placeholder="Image URL" className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white" required />
-              <select name="category" defaultValue={editEvent?.category || 'conference'} className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white">
+              <input name="title" defaultValue={editEvent?.title || ''} placeholder="Title" className="w-full px-4 py-2 rounded-md border border-gray-700 bg-gray-700 text-white placeholder-gray-400" required />
+              <textarea name="description" defaultValue={editEvent?.description || ''} placeholder="Description" className="w-full px-4 py-2 rounded-md border border-gray-700 bg-gray-700 text-white placeholder-gray-400 min-h-[200px]" required />
+              <input name="date" type="date" defaultValue={editEvent?.date?.slice(0,10) || ''} className="w-full px-4 py-2 rounded-md border border-gray-700 bg-gray-700 text-white" required />
+              <input name="location" defaultValue={editEvent?.location || ''} placeholder="Location" className="w-full px-4 py-2 rounded-md border border-gray-700 bg-gray-700 text-white placeholder-gray-400" required />
+              <select name="category" defaultValue={editEvent?.category || 'conference'} className="w-full px-4 py-2 rounded-md border border-gray-700 bg-gray-700 text-white">
                 <option value="conference">Conference</option>
                 <option value="workshop">Workshop</option>
                 <option value="meetup">Meetup</option>
@@ -316,12 +372,12 @@ export default function AdminPage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-sm p-8 relative"
+              className="bg-gray-800 rounded-xl shadow-xl w-full max-w-sm p-8 relative"
             >
-              <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Are you sure you want to delete?</h2>
+              <h2 className="text-xl font-bold mb-4 text-white">Are you sure you want to delete?</h2>
               <div className="flex justify-end gap-4 mt-6">
                 <button
-                  className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2 rounded-md bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
                   onClick={cancelDelete}
                 >
                   No
@@ -337,55 +393,6 @@ export default function AdminPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
-
-function SettingsDropdown() {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
-
-  const handleAccount = () => {
-    setOpen(false);
-    router.push('/my-account');
-  };
-
-  const handleSignOut = () => {
-    setOpen(false);
-    alert('Signed out (mock)!');
-  };
-
-  return (
-    <div className="relative">
-      <button
-        className="flex items-center gap-1.5 px-3 py-2 rounded-md border text-sm font-medium transition-colors bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <Settings size={19} className="mr-1" />
-        <svg className={`ml-1 w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-      </button>
-      {open && (
-        <div className="absolute right-0 mt-2 min-w-[180px] w-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
-          <div className="flex items-center  px-4 py-2">
-            <span className="text-sm text-gray-700 dark:text-gray-200 mr-1">Theme</span>
-            <ThemeToggle />
-          </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-          <button
-            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-            onClick={handleAccount}
-          >
-            My Account
-          </button>
-          <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-          <button
-            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </button>
-        </div>
-      )}
     </div>
   );
 } 

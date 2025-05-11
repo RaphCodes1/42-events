@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, User, Settings } from 'lucide-react';
 import { SearchBar } from '../components/ui/SearchBar';
@@ -15,6 +15,8 @@ import useUserStore from '../store/userStore';
 import { Event } from '../types';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
+import React from 'react';
 
 export default function Home() {
   const { filteredEvents, searchTerm, setSearchTerm, sortOption, setSortOption, categoryFilter, setCategoryFilter } = useEventsStore();
@@ -24,6 +26,21 @@ export default function Home() {
   const [showSubscribed, setShowSubscribed] = useState(false);
   const { scrollY } = useScrollEffect();
   const router = useRouter();
+  
+
+  React.useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.log('No session found, redirecting to login');
+        router.push('/login');
+        return;
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -62,6 +79,14 @@ export default function Home() {
         staggerChildren: 0.1
       }
     }
+  };
+
+  const categoryColors = {
+    conference: 'bg-blue-100 text-blue-800 border-blue-200',
+    workshop: 'bg-green-100 text-green-800 border-green-200',
+    meetup: 'bg-purple-100 text-purple-800 border-purple-200',
+    exhibition: 'bg-amber-100 text-amber-800 border-amber-200',
+    other: 'bg-gray-100 text-gray-800 border-gray-200',
   };
 
   return (
@@ -193,6 +218,7 @@ export default function Home() {
         event={selectedEvent}
         isOpen={isModalOpen}
         onClose={closeModal}
+        categoryColor={selectedEvent ? categoryColors[selectedEvent.category] : undefined}
       />
     </div>
   );
@@ -207,9 +233,13 @@ function SettingsDropdown() {
     router.push('/my-account');
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async() => {
     setOpen(false);
-    alert('Signed out (mock)!');
+    const { error } = await supabase.auth.signOut();
+    if(error){
+      throw error;
+    }
+    router.push('/login');
   };
 
   return (
@@ -219,7 +249,6 @@ function SettingsDropdown() {
         onClick={() => setOpen((v) => !v)}
       >
         <Settings size={19} className="mr-1" />
-        {/* <span>Settings</span> */}
         <svg className={`ml-1 w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
       </button>
       {open && (
