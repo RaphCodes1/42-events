@@ -110,10 +110,9 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
       <header className={`sticky top-0 z-40 bg-gray-50 dark:bg-gray-900 transition-all duration-300 border-b border-gray-200 dark:border-gray-700 ${scrollY > 10 ? 'shadow-md' : ''}`}>
-        <div className="container mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="container mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center">
           <div className="flex items-center">
             <div className="flex items-center">
-              {/* <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={24} /> */}
               <Image
                 src="/42_logo_white.png"
                 alt="42 Logo"
@@ -125,14 +124,14 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="flex-1 max-w-md">
+          <div className="flex-1 max-w-md -ml-2">
             <SearchBar 
               onSearch={handleSearch}
               initialValue={searchTerm}
             />
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 ml-auto">
             <button
               className={`flex items-center gap-1.5 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
                 showSubscribed 
@@ -155,7 +154,7 @@ export default function Home() {
       </header>
 
       {/* Filters */}
-      <div className="container mx-auto px-4 py-4 flex flex-wrap items-center gap-3 justify-between border-b border-gray-200 dark:border-gray-700">
+      <div className="container mx-auto px-4 py-4 flex flex-wrap items-center gap-3 justify-between border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">
           <CategoryFilter 
             currentCategory={categoryFilter}
@@ -251,7 +250,6 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
               <div className="flex items-center">
-                {/* <Calendar className="text-primary-600 dark:text-primary-400 mr-2" size={16} /> */}
                 <Image
                   src="/42_logo_white.png"
                   alt="42 Logo"
