@@ -42,11 +42,14 @@ export const Button: React.FC<ButtonProps> = ({
     lg: 'px-6 py-3 text-lg',
   };
 
+  // Only apply variant styles if no custom className is provided
+  const shouldApplyVariantStyles = !className.includes('border-') && !className.includes('text-') && !className.includes('bg-');
+
   return (
     <motion.button
       className={`
         ${baseStyles}
-        ${variantStyles[variant]}
+        ${shouldApplyVariantStyles ? variantStyles[variant] : ''}
         ${sizeStyles[size]}
         ${className}
       `}

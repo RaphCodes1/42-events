@@ -27,7 +27,7 @@ const SubscriptionButton = dynamic(() => Promise.resolve(({ eventId, onClick }: 
       size="sm"
       variant={subscribed ? "outline" : "primary"}
       onClick={handleClick}
-      className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : ""}
+      className={subscribed ? "rounded-full border-2 border-green-600 text-green-600 hover:bg-green-50" : "rounded-full border-2 border-primary-600 bg-primary-600 text-white hover:bg-primary-200"}
     >
       {subscribed ? "Subscribed" : "Subscribe"}
     </Button>

@@ -129,7 +129,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   <Button 
                     variant="outline" 
                     onClick={onClose}
-                    className="border-gray-600 text-gray-200 hover:bg-gray-700"
+                    className="rounded-full border-2 border-gray-200 text-gray-600 hover:bg-gray-700 hover:text-white"
                   >
                     Close
                   </Button>
@@ -138,7 +138,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                       <Button 
                         onClick={handleEdit}
                         variant="outline"
-                        className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                        className="rounded-full border-2 border-blue-400 text-blue-600 hover:bg-blue-50"
                       >
                         <Edit size={16} className="mr-2" />
                         Edit
@@ -146,7 +146,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                       <Button 
                         onClick={handleDelete}
                         variant="outline"
-                        className="border-red-600 text-red-600 hover:bg-red-50"
+                        className="rounded-full border-2 border-red-400 text-red-600 hover:bg-red-50"
                       >
                         <Trash2 size={16} className="mr-2" />
                         Delete
@@ -156,7 +156,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                     <Button 
                       onClick={handleSubscribeToggle}
                       variant={subscribed ? "outline" : "primary"}
-                      className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : "bg-primary-600 hover:bg-primary-700 text-white"}
+                      className={subscribed ? "rounded-full border-2 border-green-600 text-green-600 hover:bg-green-50" : "rounded-full border-2 bg-primary-600 hover:bg-primary-700 text-white"}
                     >
                       {subscribed ? "Unsubscribe" : "Subscribe to Event"}
                     </Button>
