@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, User, Settings } from 'lucide-react';
 import { SearchBar } from '../components/ui/SearchBar';
@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import React from 'react';
+import { fetchEvents } from '../data/mockEvents';
 
 export default function Home() {
   const { filteredEvents, searchTerm, setSearchTerm, sortOption, setSortOption, categoryFilter, setCategoryFilter } = useEventsStore();
@@ -27,13 +28,24 @@ export default function Home() {
   const { scrollY } = useScrollEffect();
   const router = useRouter();
   
+  // Fetch events when component mounts
+  React.useEffect(() => {
+    const initializeData = async () => {
+      try {
+        await fetchEvents();
+      } catch (error) {
+        console.error('Error initializing events:', error);
+      }
+    };
+    initializeData();
+  }, []);
 
   React.useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      if (!session) {
-        console.log('No session found, redirecting to login');
+      if (userError || !user) {
+        console.log('Authentication error or no user found, redirecting to login');
         router.push('/login');
         return;
       }
@@ -88,7 +100,7 @@ export default function Home() {
     exhibition: 'bg-amber-100 text-amber-800 border-amber-200',
     other: 'bg-gray-100 text-gray-800 border-gray-200',
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
@@ -241,6 +253,8 @@ function SettingsDropdown() {
     }
     router.push('/login');
   };
+
+
 
   return (
     <div className="relative">

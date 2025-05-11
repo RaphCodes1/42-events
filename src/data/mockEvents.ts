@@ -1,7 +1,8 @@
+'use client';
 import { Event } from '../types';
 import { format } from 'date-fns';
-import { fromDatabase } from '../types';
 import { supabase } from '../lib/supabase';
+import useEventsStore from '../store/eventsStore';
 
 // Helper to create dates relative to today
 const getRelativeDate = (dayOffset: number): string => {
@@ -10,97 +11,125 @@ const getRelativeDate = (dayOffset: number): string => {
   return format(date, "yyyy-MM-dd'T'HH:mm:ss");
 };
 
-const fetchEvents = async ()=>{
-  const {data, error} = await supabase
-  .from('events_data')
-  .select('*')
-  if(error){
-    throw error;
-  }
-  console.log(data);
-  return data;
-}
-
-export const mockEvents: Event[] = [
-  {
-    id: '1',
-    title: 'Tech Innovation Summit',
-    description: 'Join industry leaders to explore the future of technology and innovation. Network with professionals, attend keynotes, and participate in hands-on workshops.',
-    date: '2025-06-01T10:00:00',
-    location: 'San Francisco Convention Center',
-    category: 'conference',
-    createdAt: '2025-05-01T09:00:00',
-  },
-  {
-    id: '2',
-    title: 'Design Systems Workshop',
-    description: 'A hands-on workshop focused on creating scalable design systems for product teams. Learn best practices, tools, and methodologies.',
-    date: '2025-06-10T14:00:00',
-    location: 'Design Hub, New York',
-    category: 'workshop',
-    createdAt: '2025-05-10T09:00:00',
-  },
-  {
-    id: '3',
-    title: 'JavaScript Developer Meetup',
-    description: 'Monthly meetup for JavaScript developers to share knowledge, discuss the latest trends, and network with fellow developers.',
-    date: '2025-06-05T18:00:00',
-    location: 'TechSpace Austin',
-    category: 'meetup',
-    createdAt: '2025-05-20T09:00:00',
-  },
-  {
-    id: '4',
-    title: 'AI & Machine Learning Conference',
-    description: 'Explore the latest advancements in artificial intelligence and machine learning with keynotes, panels, and networking opportunities.',
-    date: '2025-06-20T09:00:00',
-    location: 'Seattle Tech Campus',
-    category: 'conference',
-    createdAt: '2025-04-15T09:00:00',
-  },
-  {
-    id: '6',
-    title: 'DevOps Best Practices Workshop',
-    description: 'Learn how to implement DevOps practices in your organization with this hands-on workshop led by industry experts.',
-    date: '2025-06-12T13:00:00',
-    location: 'Virtual',
-    category: 'workshop',
-    createdAt: '2025-05-15T09:00:00',
-  },
-  {
-    id: '7',
-    title: 'Modern Art Exhibition',
-    description: 'Explore contemporary artwork from emerging artists across various media, including paintings, sculptures, and digital installations.',
-    date: '2025-06-07T11:00:00',
-    location: 'Metropolitan Art Gallery',
-    category: 'exhibition',
-    createdAt: '2025-05-22T09:00:00',
-  },
-  {
-    id: '8',
-    title: 'React Advanced Conference',
-    description: 'Conference dedicated to advanced React techniques, state management, performance optimization, and ecosystem tools.',
-    date: '2025-06-15T10:00:00',
-    location: 'London Tech Center',
-    category: 'conference',
-    createdAt: '2025-04-20T09:00:00',
-  },
-  {
-    id: '9',
-    title: 'Product Management Bootcamp',
-    description: 'Intensive two-day bootcamp covering product strategy, roadmapping, prioritization, and stakeholder management.',
-    date: '2025-06-18T09:00:00',
-    location: 'Innovation Hub, Chicago',
-    category: 'workshop',
-    createdAt: '2025-05-05T09:00:00',
-  },
-  {
-    id: '10',
-    title: 'Startup Networking Mixer',
-    description: 'Connect with founders, investors, and startup enthusiasts in an informal setting. Perfect for making connections and finding potential collaborators.',
-    date: '2025-06-03T17:00:00',
-    location: 'Founders Club',
-    category: 'meetup',
-    createdAt: '2025-05-25T09:00:00',
-  },
+// Default mock data for development
+const defaultMockEvents: Event[] = [
 ];
+
+export let mockEvents: Event[] = [...defaultMockEvents];
+
+// Function to insert initial data into the database
+export const insertInitialData = async () => {
+  console.log('Attempting to insert initial data...');
+  try {
+    // First check if we already have data
+    const { data: existingData, error: checkError } = await supabase
+      .from('event_data')
+      .select('id')
+      .limit(1);
+
+    if (checkError) {
+      console.error('Error checking existing data:', checkError);
+      return;
+    }
+
+    if (existingData && existingData.length > 0) {
+      console.log('Data already exists in database, skipping initial data insertion');
+      return;
+    }
+
+    // Insert each mock event into the database
+    for (const event of defaultMockEvents) {
+      const { error: insertError } = await supabase
+        .from('event_data')
+        .insert({
+          title: event.title,
+          description: event.description,
+          date: event.date,
+          location: event.location,
+          category: event.category,
+          created_at: event.createdAt
+        });
+
+      if (insertError) {
+        console.error('Error inserting event:', {
+          event: event.title,
+          error: insertError
+        });
+      } else {
+        console.log('Successfully inserted event:', event.title);
+      }
+    }
+    console.log('Initial data insertion completed');
+  } catch (error) {
+    console.error('Unexpected error during initial data insertion:', error);
+  }
+};
+
+export const fetchEvents = async () => {
+  console.log('Starting fetchEvents...');
+  try {
+    console.log('Attempting to fetch events from Supabase...');
+    const { data, error } = await supabase
+      .from('event_data')
+      .select('*');
+      
+    if (error) {
+      console.error('Error fetching events from Supabase:', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      console.log('Falling back to mock data due to error');
+      useEventsStore.getState().setEvents(mockEvents);
+      return;
+    }
+
+    console.log('Supabase response received:', {
+      dataLength: data?.length ?? 0,
+      hasData: !!data,
+      firstEvent: data?.[0] ? {
+        id: data[0].id,
+        title: data[0].title,
+        date: data[0].date
+      } : null
+    });
+
+    if (data && data.length > 0) {
+      console.log('Processing fetched events...');
+      const events = data.map((event): Event => ({
+        id: String(event.id),
+        title: event.title,
+        description: event.description,
+        date: String(event.date),
+        location: event.location,
+        category: event.category,
+        createdAt: String(event.created_at),
+      }));
+      
+      console.log('Events processed successfully:', {
+        totalEvents: events.length,
+        categories: [...new Set(events.map(e => e.category))],
+        dateRange: {
+          earliest: events.reduce((a, b) => new Date(a.date) < new Date(b.date) ? a : b).date,
+          latest: events.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b).date
+        }
+      });
+
+      mockEvents = events;
+      useEventsStore.getState().setEvents(events);
+      console.log('Events stored in state successfully');
+    } else {
+      console.log('No events found in database, using mock data');
+      useEventsStore.getState().setEvents(mockEvents);
+    }
+  } catch (error) {
+    console.error('Unexpected error in fetchEvents:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    console.log('Falling back to mock data due to unexpected error');
+    useEventsStore.getState().setEvents(mockEvents);
+  }
+  console.log('fetchEvents completed');
+};

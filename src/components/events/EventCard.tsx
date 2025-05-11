@@ -60,22 +60,24 @@ export const EventCard: React.FC<EventCardProps> = ({ event, index, onClick }) =
       whileHover={{ y: -5 }}
       onClick={onClick}
     >
-      <div className={`w-full h-20 relative overflow-hidden ${categoryColor}`}>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h3 className="text-xl font-bold truncate text-center p-4">{event.title}</h3>
+      <div className={`w-full h-24 relative overflow-hidden ${categoryColor.split(' ')[0]}`}>
+        <div className="absolute inset-0 flex items-center justify-center p-4">
+          <h3 className={`text-xl font-bold text-center ${categoryColor.split(' ')[1]} line-clamp-2`}>
+            {event.title}
+          </h3>
         </div>
       </div>
       
       <div className="p-4">
-        <div className="flex items-center justify-center text-xs text-gray-600 mb-5 mt-2">
-          <Calendar size={16} className="mr-0" />
-          <span className="px-2 py-1.2 whitespace-nowrap">{format(parseISO(event.date), 'MMM d, yyyy')}</span>
+        <div className="flex items-center justify-center text-xs text-gray-600 mb-4">
+          <Calendar size={16} className="mr-1" />
+          <span className="px-2 py-1 whitespace-nowrap">{format(parseISO(event.date), 'MMM d, yyyy')}</span>
           <span className="mx-1">•</span>
-          <MapPin size={16} className="mx-1" />
-          <span className="truncate text-s">{event.location}</span>
+          <MapPin size={16} className="mr-1" />
+          <span className="truncate">{event.location}</span>
         </div>
         
-        <p className="text-gray-700 line-clamp-2 mb-6 h-18 px-2 py-1.2 mt-3">
+        <p className="text-gray-700 line-clamp-2 mb-4 px-2">
           {event.description}
         </p>
         

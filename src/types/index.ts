@@ -8,14 +8,14 @@ export interface Event {
   createdAt: string;
 }
 
-export interface fromDatabase {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  location: string;
-  category: EventCategory;
-}
+// export interface fromDatabase {
+//   id: string;
+//   title: string;
+//   description: string;
+//   date: string;
+//   location: string;
+//   category: EventCategory;
+// }
 
 export type EventCategory = 'conference' | 'workshop' | 'meetup' | 'exhibition' | 'other';
 
@@ -39,4 +39,5 @@ export interface EventsState {
   setCategoryFilter: (category: EventCategory | 'all') => void;
   addEvent: (event: Event) => void;
   deleteEvent: (eventId: string) => void;
+  setEvents: (events: Event[]) => void;
 }

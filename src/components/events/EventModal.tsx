@@ -126,7 +126,11 @@ export const EventModal: React.FC<EventModalProps> = ({
                 </div>
                 
                 <div className="flex justify-end space-x-4">
-                  <Button variant="outline" onClick={onClose}>
+                  <Button 
+                    variant="outline" 
+                    onClick={onClose}
+                    className="border-gray-600 text-gray-200 hover:bg-gray-700"
+                  >
                     Close
                   </Button>
                   {isAdmin ? (
@@ -152,7 +156,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                     <Button 
                       onClick={handleSubscribeToggle}
                       variant={subscribed ? "outline" : "primary"}
-                      className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : ""}
+                      className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : "bg-primary-600 hover:bg-primary-700 text-white"}
                     >
                       {subscribed ? "Unsubscribe" : "Subscribe to Event"}
                     </Button>

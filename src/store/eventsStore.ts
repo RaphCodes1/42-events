@@ -46,6 +46,16 @@ const useEventsStore = create<EventsState>()((set, get) => ({
   sortOption: 'date-asc',
   categoryFilter: 'all',
   
+  setEvents: (events) => {
+    set((state) => {
+      const filtered = filterEvents(events, state.searchTerm, state.categoryFilter);
+      return {
+        events,
+        filteredEvents: sortEvents(filtered, state.sortOption),
+      };
+    });
+  },
+
   setSearchTerm: (searchTerm) => {
     set({ searchTerm });
     const { events, sortOption, categoryFilter } = get();
