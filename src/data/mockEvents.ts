@@ -1,5 +1,7 @@
 import { Event } from '../types';
 import { format } from 'date-fns';
+import { fromDatabase } from '../types';
+import { supabase } from '../lib/supabase';
 
 // Helper to create dates relative to today
 const getRelativeDate = (dayOffset: number): string => {
@@ -7,6 +9,17 @@ const getRelativeDate = (dayOffset: number): string => {
   date.setDate(date.getDate() + dayOffset);
   return format(date, "yyyy-MM-dd'T'HH:mm:ss");
 };
+
+const fetchEvents = async ()=>{
+  const {data, error} = await supabase
+  .from('events_data')
+  .select('*')
+  if(error){
+    throw error;
+  }
+  console.log(data);
+  return data;
+}
 
 export const mockEvents: Event[] = [
   {

@@ -1,8 +1,8 @@
-// File: /Users/raphaelcreer/Desktop/ProjectsWeb/42-events/src/app/login/page.tsx
-import * as entry from '../../../../src/app/login/page.js'
+// File: /Users/raphaelcreer/Desktop/ProjectsWeb/42-events/src/app/my-account/page.tsx
+import * as entry from '../../../../src/app/my-account/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../src/app/login/page.js')
+type TEntry = typeof import('../../../../src/app/my-account/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

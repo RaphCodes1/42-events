@@ -11,7 +11,7 @@ import { useScrollEffect } from '../../hooks/useScrollEffect';
 import useEventsStore from '../../store/eventsStore';
 import { Event } from '../../types';
 import { useRouter } from 'next/navigation';
-import { supabase } from "@/lib/supabase";
+import { supabase } from '../../lib/supabase';
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);

@@ -8,6 +8,15 @@ export interface Event {
   createdAt: string;
 }
 
+export interface fromDatabase {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  category: EventCategory;
+}
+
 export type EventCategory = 'conference' | 'workshop' | 'meetup' | 'exhibition' | 'other';
 
 export type SortOption = 'title-asc' | 'title-desc' | 'date-asc' | 'date-desc' | 'created-asc' | 'created-desc';

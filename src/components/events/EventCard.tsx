@@ -5,6 +5,34 @@ import { format, parseISO } from 'date-fns';
 import { Button } from '../ui/Button';
 import { Event } from '../../types';
 import useUserStore from '../../store/userStore';
+import dynamic from 'next/dynamic';
+
+// Create a client-only subscription button component
+const SubscriptionButton = dynamic(() => Promise.resolve(({ eventId, onClick }: { eventId: string, onClick: (e: React.MouseEvent) => void }) => {
+  const { isSubscribed, subscribe, unsubscribe } = useUserStore();
+  const subscribed = isSubscribed(eventId);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (subscribed) {
+      unsubscribe(eventId);
+    } else {
+      subscribe(eventId);
+    }
+    onClick(e);
+  };
+
+  return (
+    <Button
+      size="sm"
+      variant={subscribed ? "outline" : "primary"}
+      onClick={handleClick}
+      className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : ""}
+    >
+      {subscribed ? "Subscribed" : "Subscribe"}
+    </Button>
+  );
+}), { ssr: false });
 
 interface EventCardProps {
   event: Event;
@@ -13,18 +41,6 @@ interface EventCardProps {
 }
 
 export const EventCard: React.FC<EventCardProps> = ({ event, index, onClick }) => {
-  const { isSubscribed, subscribe, unsubscribe } = useUserStore();
-  const subscribed = isSubscribed(event.id);
-
-  const handleSubscribeToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (subscribed) {
-      unsubscribe(event.id);
-    } else {
-      subscribe(event.id);
-    }
-  };
-
   const categoryColors = {
     conference: 'bg-blue-100 text-blue-800 border-blue-200',
     workshop: 'bg-green-100 text-green-800 border-green-200',
@@ -71,14 +87,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, index, onClick }) =
             </div>
           </span>
           
-          <Button
-            size="sm"
-            variant={subscribed ? "outline" : "primary"}
-            onClick={handleSubscribeToggle}
-            className={subscribed ? "border-green-600 text-green-600 hover:bg-green-50" : ""}
-          >
-            {subscribed ? "Subscribed" : "Subscribe"}
-          </Button>
+          <SubscriptionButton eventId={event.id} onClick={(e) => e.stopPropagation()} />
         </div>
       </div>
     </motion.div>

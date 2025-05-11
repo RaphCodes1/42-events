@@ -15,7 +15,7 @@ import useUserStore from '../store/userStore';
 import { Event } from '../types';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../lib/supabase';
 import React from 'react';
 
 export default function Home() {
