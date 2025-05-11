@@ -114,7 +114,7 @@ export default function Home() {
           <div className="flex items-center">
             <div className="flex items-center">
               <Image
-                src="/42_logo_white.png"
+                src="/42_Logo_white.png"
                 alt="42 Logo"
                 width={40}
                 height={40}
@@ -251,7 +251,7 @@ export default function Home() {
             <div className="flex items-center mb-4 md:mb-0">
               <div className="flex items-center">
                 <Image
-                  src="/42_logo_white.png"
+                  src="/42_Logo_white.png"
                   alt="42 Logo"
                   width={24}
                   height={24}
