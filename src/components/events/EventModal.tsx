@@ -16,6 +16,42 @@ interface EventModalProps {
   onDelete?: (eventId: string) => void;
 }
 
+const customScrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: #374151;
+  }
+  
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #4B5563;
+  }
+  
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #6B7280;
+  }
+`;
+
+const styleSheet = document.createElement("style");
+styleSheet.innerText = customScrollbarStyles;
+document.head.appendChild(styleSheet);
+
 export const EventModal: React.FC<EventModalProps> = ({ 
   event, 
   isOpen, 
@@ -122,7 +158,9 @@ export const EventModal: React.FC<EventModalProps> = ({
                 </div>
                 
                 <div className="prose prose-sm sm:prose max-w-none mb-6">
-                  <p className="text-gray-700">{event.description}</p>
+                  <div className="max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                    <p className="text-gray-700">{event.description}</p>
+                  </div>
                 </div>
                 
                 <div className="flex justify-end space-x-4">
