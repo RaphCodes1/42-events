@@ -19,6 +19,7 @@ interface EventModalProps {
 const customScrollbarStyles = `
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
   
   .custom-scrollbar::-webkit-scrollbar-track {
@@ -45,6 +46,17 @@ const customScrollbarStyles = `
   
   .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #6B7280;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .custom-scrollbar::-webkit-scrollbar:horizontal {
+    height: 4px;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .custom-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: thin;  /* Firefox */
   }
 `;
 
@@ -122,11 +134,13 @@ export const EventModal: React.FC<EventModalProps> = ({
             >
               <div className={`w-full h-20 relative overflow-hidden ${categoryColor?.split(' ')[0]}`}>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <h2 className={`text-xl font-bold truncate text-center p-4 ${categoryColor?.split(' ')[1]}`}>{event.title}</h2>
+                  <div className="w-full max-h-[80px] overflow-y-auto custom-scrollbar px-4">
+                    <h2 className={`text-xl font-bold text-center ${categoryColor?.split(' ')[1]}`}>{event.title}</h2>
+                  </div>
                 </div>
                 <button 
                   onClick={onClose}
-                  className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full transition-colors"
+                  className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full transition-colors z-10"
                 >
                   <X size={20} />
                 </button>

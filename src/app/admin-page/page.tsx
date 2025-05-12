@@ -409,7 +409,7 @@ export default function AdminPage() {
       </div>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 pt-8 pb-0">
+      <main className="container mx-auto px-4 pt-8 pb-16">
         {/* Results count and create button */}
         <div className="mb-0 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-200 mb-2">
@@ -489,17 +489,19 @@ export default function AdminPage() {
                         <h3 className={`text-xl font-bold truncate text-center p-4 ${categoryColors[event.category].split(' ')[1]}`}>{event.title}</h3>
                       </div>
                     </div>
-                    <div className="p-4 bg-white">
+                    <div className="p-4 bg-white flex flex-col min-h-[160px]">
                       <div className="flex items-center justify-center text-xs text-gray-600 mb-2">
                         <Calendar size={16} className="mr-0" />
                         <span className="px-2 py-1.2 whitespace-nowrap" style={{ fontSize: '12px' }}>{formatDate(event.date)}</span>
                         <span className="mx-1">•</span>
                         <span className="truncate text-xs">{event.location}</span>
                       </div>
-                      <p className="text-gray-700 line-clamp-2 mb-4 h-18 px-2 py-1.2 mt-3">
-                        {event.description}
-                      </p>
-                      <div className="flex items-center justify-between mt-3">
+                      <div className="flex-grow min-h-[48px]">
+                        <p className="text-gray-700 line-clamp-2 px-2 py-1">
+                          {event.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between mt-auto pt-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${categoryColors[event.category]}`}>
                           <div className="flex items-center">
                             <Tag size={12} className="mr-1" />
