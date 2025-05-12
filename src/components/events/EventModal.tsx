@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, MapPin, Tag, Edit, Trash2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -16,6 +16,7 @@ interface EventModalProps {
   onDelete?: (eventId: string) => void;
 }
 
+// Move the styles definition outside the component
 const customScrollbarStyles = `
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
@@ -60,10 +61,6 @@ const customScrollbarStyles = `
   }
 `;
 
-const styleSheet = document.createElement("style");
-styleSheet.innerText = customScrollbarStyles;
-document.head.appendChild(styleSheet);
-
 export const EventModal: React.FC<EventModalProps> = ({ 
   event, 
   isOpen, 
@@ -73,6 +70,21 @@ export const EventModal: React.FC<EventModalProps> = ({
   onEdit,
   onDelete
 }) => {
+  // Add useEffect for style injection
+  useEffect(() => {
+    // Only inject styles on the client side
+    if (typeof document !== 'undefined') {
+      const styleSheet = document.createElement("style");
+      styleSheet.innerText = customScrollbarStyles;
+      document.head.appendChild(styleSheet);
+
+      // Cleanup function to remove the style when component unmounts
+      return () => {
+        document.head.removeChild(styleSheet);
+      };
+    }
+  }, []); // Empty dependency array means this runs once on mount
+
   const { isSubscribed, subscribe, unsubscribe } = useUserStore();
   
   if (!event) return null;
